@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+.bun/
+bun.lockb
+
+# Build output
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+
+# Environment variables
+.env
+*.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun.log*
+
+# Database data (managed by volume but just in case)
+db-data/
