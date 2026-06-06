@@ -1,0 +1,17 @@
+{
+  "name": "Travel Agent Bun Environment",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "dsznajder.es7-react-js-snippets",
+        "oven.bun-vscode"
+      ]
+    }
+  },
+  "remoteUser": "root"
+}
