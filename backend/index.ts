@@ -1,11 +1,15 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
+import authRoutes from './src/routes/authRoutes.ts';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
+
+// Routes
+app.use('/api/v1/auth', authRoutes);
 
 // Create a robust connection pool using raw mysql2
 // This avoids the Prisma 7 adapter timeout issues in this specific Bun environment
