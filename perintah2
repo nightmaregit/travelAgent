@@ -1,0 +1,26 @@
+submit issue.md sebagai github issue baru
+
+buatkan issue.md yang berisi perencanaan untuk nanti di implemenasikan oleh junior programmer atau ai model yang murah
+
+isi dari planingnya sebagai berikut:
+Buatkan routing dan controller logic berdasarkan daftar endpoint RESTful API di bawah ini. Gunakan standar format respons JSON. Implementasikan sistem autentikasi menggunakan Bearer Token (JWT/Sanctum). Semua endpoint harus diawali dengan base prefix /api/v1.
+
+A. Modul Authentication (Otentikasi)
+
+    POST /api/v1/auth/register
+
+        Akses: Publik
+
+        Request Body: full_name, email, password, phone_number
+
+        Tujuan: Mendaftarkan customer baru.
+
+    POST /api/v1/auth/login
+
+        Akses: Publik
+
+        Request Body: email, password
+
+        Tujuan: Mengembalikan Bearer Token dan data user.
+
+Jelaskan tahapan-tahapan yang harus dilkukan untuk mengimplementasikan fitur ini, anggap nanti yang implementasikan adalah junior programer atau model ai yang lebih murah

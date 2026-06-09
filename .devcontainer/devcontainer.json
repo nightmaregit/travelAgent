@@ -3,6 +3,8 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspace",
+  "dockerPath": "podman",
+  "dockerComposePath": "podman-compose",
   "customizations": {
     "vscode": {
       "extensions": [

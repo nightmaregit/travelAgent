@@ -1,0 +1,154 @@
+podman system service -t 0 &
+bun run dev -- --host
+
+buatkan issue.md yang berisi perencanaan untuk nanti di implemenasikan oleh junior programmer atau ai model yang murah
+
+isi dari planingnya sebagai berikut:
+
+Buatkan saya schema database atau migration file berdasarkan spesifikasi di bawah ini. Nama Database adalah travelagent. Semua tabel wajib memiliki kolom timestamp (created_at dan updated_at). Gunakan Foreign Key (FK) dengan aturan ON DELETE CASCADE untuk relasi yang sesuai.
+
+A. Tabel users
+
+Menyimpan kredensial dan profil pengguna.
+id (Primary Key, Auto Increment/UUID)
+full_name (String/Varchar 100)
+email (String/Varchar 100, Unique)
+password (String/Varchar 255)
+phone_number (String/Varchar 20, Nullable)
+role (Enum: 'admin', 'customer', Default: 'customer')
+
+B. Tabel tour_packages
+
+Menyimpan katalog paket wisata.
+
+    id (Primary Key)
+    title (String/Varchar 150)
+    destination (String/Varchar 100)
+    description (Text)
+    price (Decimal/Numeric, presisi untuk nominal mata uang, misal 12,2)
+    quota (Integer, jumlah maksimum peserta)
+    start_date (Date)
+    end_date (Date)
+    is_active (Boolean, Default: true - untuk soft hide paket tanpa menghapus data)
+
+C. Tabel bookings
+
+Menyimpan data pesanan.
+
+    id (Primary Key)
+    user_id (Foreign Key merujuk ke users.id)
+    tour_package_id (Foreign Key merujuk ke tour_packages.id)
+    booking_code (String/Varchar 50, Unique, untuk nomor referensi pesanan)
+    booking_date (DateTime)
+    total_pax (Integer, jumlah peserta yang dipesan)
+    total_amount (Decimal/Numeric, total_pax * price saat itu)
+    status (Enum: 'pending', 'confirmed', 'cancelled', Default: 'pending')
+
+D. Tabel payments
+
+Menyimpan rekam jejak pembayaran dari sebuah pesanan.
+
+    id (Primary Key)
+    booking_id (Foreign Key merujuk ke bookings.id)
+    payment_method (String/Varchar 50, misal: 'Bank Transfer', 'Credit Card')
+    amount_paid (Decimal/Numeric)
+    payment_date (DateTime, Nullable, diisi ketika pembayaran sukses)
+    status (Enum: 'unpaid', 'success', 'failed', Default: 'unpaid')
+    proof_image (String/Varchar 255, Nullable, untuk menyimpan path bukti transfer jika sistem manual)
+
+Buatkan routing dan controller logic berdasarkan daftar endpoint RESTful API di bawah ini. Gunakan standar format respons JSON. Implementasikan sistem autentikasi menggunakan Bearer Token (JWT/Sanctum). Semua endpoint harus diawali dengan base prefix /api/v1.
+
+A. Modul Authentication (Otentikasi)
+
+    POST /api/v1/auth/register
+
+        Akses: Publik
+
+        Request Body: full_name, email, password, phone_number
+
+        Tujuan: Mendaftarkan customer baru.
+
+    POST /api/v1/auth/login
+
+        Akses: Publik
+
+        Request Body: email, password
+
+        Tujuan: Mengembalikan Bearer Token dan data user.
+
+B. Modul Tour Packages (Katalog Paket)
+
+    GET /api/v1/packages
+
+        Akses: Publik
+
+        Tujuan: Menampilkan daftar paket wisata (yang is_active = true). Dukung fitur query string untuk pencarian atau filter destinasi (misal: ?destination=bali).
+
+    GET /api/v1/packages/{id}
+
+        Akses: Publik
+
+        Tujuan: Menampilkan detail satu paket wisata.
+
+    POST /api/v1/packages
+
+        Akses: Admin (Requires Token)
+
+        Request Body: title, destination, description, price, quota, start_date, end_date
+
+        Tujuan: Admin menambahkan paket baru.
+
+    PUT /api/v1/packages/{id}
+
+        Akses: Admin (Requires Token)
+
+        Tujuan: Admin memperbarui data paket.
+
+    DELETE /api/v1/packages/{id}
+
+        Akses: Admin (Requires Token)
+
+        Tujuan: Admin menghapus atau menonaktifkan paket (soft delete / set is_active = false).
+
+C. Modul Bookings (Pemesanan)
+
+    POST /api/v1/bookings
+
+        Akses: Customer (Requires Token)
+
+        Request Body: tour_package_id, total_pax
+
+        Tujuan: Membuat pesanan baru. Penting: Sistem harus mengecek ketersediaan quota pada tour_packages sebelum membuat booking. Jika sukses, kalkulasi total_amount secara otomatis di back-end (jangan percaya harga dari request front-end).
+
+    GET /api/v1/bookings
+
+        Akses: Admin & Customer (Requires Token)
+
+        Tujuan: Jika user biasa, tampilkan hanya riwayat pesanannya sendiri. Jika admin, tampilkan semua pesanan masuk.
+
+    GET /api/v1/bookings/{id}
+
+        Akses: Admin & Customer (Requires Token)
+
+        Tujuan: Menampilkan detail spesifik dari sebuah pesanan (termasuk relasi ke paket wisata).
+
+D. Modul Payments (Pembayaran)
+
+    POST /api/v1/payments
+
+        Akses: Customer (Requires Token)
+
+        Request Body: booking_id, payment_method, amount_paid, proof_image (opsional jika ada upload struk)
+
+        Tujuan: Customer melakukan pembayaran. Sistem mengecek apakah amount_paid sesuai dengan total_amount di tabel bookings.
+
+    PUT /api/v1/payments/{id}/verify
+
+        Akses: Admin (Requires Token)
+
+        Request Body: status (ubah menjadi 'success' atau 'failed')
+
+        Tujuan: Admin memverifikasi pembayaran. Triggers: Jika status menjadi 'success', sistem harus otomatis mengubah status di tabel bookings menjadi 'confirmed'.
+
+        
+Jelaskan tahapan-tahapan yang harus dilkukan untuk mengimplementasikan fitur ini, anggap nanti yang implementasikan adalah junior programer atau model ai yang lebih murah

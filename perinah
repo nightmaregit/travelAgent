@@ -1,0 +1,15 @@
+buatkan issue.md yang berisi perencanaan untuk nanti di implemenasikan oleh junior programmer atau ai model yang murah
+
+isi dari planingnya sebagai berikut:
+
+Buatkan routing dan controller logic berdasarkan daftar endpoint RESTful API di bawah ini. Gunakan standar format respons JSON. Implementasikan sistem autentikasi menggunakan Bearer Token (JWT/Sanctum). Semua endpoint harus diawali dengan base prefix /api/v1.
+
+B. Modul Tour Packages (KatalogPaket)
+
+    GET /api/v1/packages/{id}
+
+        Akses: Publik
+
+        Tujuan: Menampilkan detail satu paket wisata.
+
+Jelaskan tahapan-tahapan yang harus dilkukan untuk mengimplementasikan fitur ini, anggap nanti yang implementasikan adalah junior programer atau model ai yang lebih murah
