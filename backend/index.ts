@@ -1,6 +1,7 @@
 import express from 'express';
 import packageRoutes from './src/routes/packageRoutes.ts';
 import authRoutes from './src/routes/authRoutes.ts';
+import bookingRoutes from './src/routes/bookingRoutes.ts';
 import pool from './src/utils/db.ts';
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(express.json());
 // Routes
 app.use('/api/v1/packages', packageRoutes);
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/bookings', bookingRoutes);
 
 app.get('/api/health', async (req, res) => {
   try {
