@@ -2,12 +2,14 @@ buatkan issue.md yang berisi perencanaan untuk nanti di implemenasikan oleh juni
 
 isi dari planingnya sebagai berikut:
 
-B. Modul Tour Packages (Katalog Paket)
+Buatkan routing dan controller logic berdasarkan daftar endpoint RESTful API di bawah ini. Gunakan standar format respons JSON. Implementasikan sistem autentikasi menggunakan Bearer Token (JWT/Sanctum). Semua endpoint harus diawali dengan base prefix /api/v1.
 
-    GET /api/v1/packages
+B. Modul Tour Packages (KatalogPaket)
+
+    GET /api/v1/packages/{id}
 
         Akses: Publik
 
-        Tujuan: Menampilkan daftar paket wisata (yang is_active = true). Dukung fitur query string untuk pencarian atau filter destinasi (misal: ?destination=bali).
+        Tujuan: Menampilkan detail satu paket wisata.
 
 Jelaskan tahapan-tahapan yang harus dilkukan untuk mengimplementasikan fitur ini, anggap nanti yang implementasikan adalah junior programer atau model ai yang lebih murah
