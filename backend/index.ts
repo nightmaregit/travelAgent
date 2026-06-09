@@ -1,6 +1,7 @@
 import express from 'express';
-import mysql from 'mysql2/promise';
+import packageRoutes from './src/routes/packageRoutes.ts';
 import authRoutes from './src/routes/authRoutes.ts';
+import pool from './src/utils/db.ts';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -9,19 +10,8 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 // Routes
+app.use('/api/v1/packages', packageRoutes);
 app.use('/api/v1/auth', authRoutes);
-
-// Create a robust connection pool using raw mysql2
-// This avoids the Prisma 7 adapter timeout issues in this specific Bun environment
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'db',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'rootpassword',
-  database: process.env.DB_NAME || 'travelagent',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
 
 app.get('/api/health', async (req, res) => {
   try {

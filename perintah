@@ -149,3 +149,6 @@ D. Modul Payments (Pembayaran)
         Request Body: status (ubah menjadi 'success' atau 'failed')
 
         Tujuan: Admin memverifikasi pembayaran. Triggers: Jika status menjadi 'success', sistem harus otomatis mengubah status di tabel bookings menjadi 'confirmed'.
+
+        
+Jelaskan tahapan-tahapan yang harus dilkukan untuk mengimplementasikan fitur ini, anggap nanti yang implementasikan adalah junior programer atau model ai yang lebih murah

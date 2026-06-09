@@ -1,0 +1,13 @@
+buatkan issue.md yang berisi perencanaan untuk nanti di implemenasikan oleh junior programmer atau ai model yang murah
+
+isi dari planingnya sebagai berikut:
+
+B. Modul Tour Packages (Katalog Paket)
+
+    GET /api/v1/packages
+
+        Akses: Publik
+
+        Tujuan: Menampilkan daftar paket wisata (yang is_active = true). Dukung fitur query string untuk pencarian atau filter destinasi (misal: ?destination=bali).
+
+Jelaskan tahapan-tahapan yang harus dilkukan untuk mengimplementasikan fitur ini, anggap nanti yang implementasikan adalah junior programer atau model ai yang lebih murah
