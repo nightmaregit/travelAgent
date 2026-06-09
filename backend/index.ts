@@ -22,12 +22,13 @@ app.get('/api/health', async (req, res) => {
     console.log('DB connection successful.');
     
     res.json({ status: 'OK', message: 'Backend and Database (mysql2) are connected' });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Database connection error details:', error);
     res.status(500).json({ 
       status: 'Error', 
       message: 'Database connection failed', 
-      details: error instanceof Error ? error.message : String(error) 
+      details: error.message || String(error),
+      stack: error.stack
     });
   }
 });
