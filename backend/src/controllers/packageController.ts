@@ -112,7 +112,7 @@ export const updatePackage = async (req: Request, res: Response) => {
 
     await pool.query(
       'UPDATE tour_packages SET title = ?, destination = ?, description = ?, price = ?, quota = ?, start_date = ?, end_date = ?, is_active = ?, updated_at = NOW() WHERE id = ?',
-      [title, destination, description, price, quota, start_date, end_date, is_active ?? true, id]
+      [title, destination, description || '', price, quota, start_date, end_date, is_active ?? true, id]
     );
 
     return res.status(200).json({
