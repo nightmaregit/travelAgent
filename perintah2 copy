@@ -1,0 +1,25 @@
+submit issue.md sebagai github issue baru
+
+buatkan issue.md yang berisi perencanaan untuk nanti di implemenasikan oleh junior programmer atau ai model yang murah
+
+isi dari planingnya sebagai berikut:
+
+D. Modul Payments (Pembayaran)
+
+    POST /api/v1/payments
+
+        Akses: Customer (Requires Token)
+
+        Request Body: booking_id, payment_method, amount_paid, proof_image (opsional jika ada upload struk)
+
+        Tujuan: Customer melakukan pembayaran. Sistem mengecek apakah amount_paid sesuai dengan total_amount di tabel bookings.
+
+    PUT /api/v1/payments/{id}/verify
+
+        Akses: Admin (Requires Token)
+
+        Request Body: status (ubah menjadi 'success' atau 'failed')
+
+        Tujuan: Admin memverifikasi pembayaran. Triggers: Jika status menjadi 'success', sistem harus otomatis mengubah status di tabel bookings menjadi 'confirmed'.
+
+Jelaskan tahapan-tahapan yang harus dilkukan untuk mengimplementasikan fitur ini, anggap nanti yang implementasikan adalah junior programer atau model ai yang lebih murah

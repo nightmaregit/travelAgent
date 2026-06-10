@@ -104,7 +104,7 @@ export const getBookings = async (req: AuthRequest, res: Response) => {
   const { id, role } = req.user!;
 
   try {
-    let query = 'SELECT b.*, p.title as package_title FROM bookings b JOIN tour_packages p ON b.tour_package_id = p.id';
+    let query = 'SELECT b.*, p.title as package_title, pay.status as payment_status, pay.proof_image, pay.id as payment_id FROM bookings b JOIN tour_packages p ON b.tour_package_id = p.id LEFT JOIN payments pay ON b.id = pay.booking_id';
     const params: any[] = [];
 
     if (role !== 'admin') {
@@ -138,7 +138,7 @@ export const getBookingById = async (req: AuthRequest, res: Response) => {
 
   try {
     const [rows]: any = await pool.query(
-      'SELECT b.*, p.title as package_title, p.destination, p.start_date, p.end_date FROM bookings b JOIN tour_packages p ON b.tour_package_id = p.id WHERE b.id = ?',
+      'SELECT b.*, p.title as package_title, p.destination, p.start_date, p.end_date, pay.status as payment_status FROM bookings b JOIN tour_packages p ON b.tour_package_id = p.id LEFT JOIN payments pay ON b.id = pay.booking_id WHERE b.id = ?',
       [booking_id]
     );
     const booking = rows[0];
@@ -175,3 +175,107 @@ export const getBookingById = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+
+export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
+  const { id: booking_id } = req.params;
+  const { status } = req.body;
+  const { role } = req.user!;
+
+  if (role !== 'admin') {
+    return res.status(403).json({
+      status: 'Error',
+      message: 'Access denied',
+      data: null
+    });
+  }
+
+  if (!['pending', 'confirmed', 'cancelled', 'paid', 'success'].includes(status)) {
+    return res.status(400).json({
+      status: 'Error',
+      message: 'Invalid status',
+      data: null
+    });
+  }
+
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const [bookings]: any = await connection.query(
+      'SELECT * FROM bookings WHERE id = ? FOR UPDATE',
+      [booking_id]
+    );
+    const booking = bookings[0];
+
+    if (!booking) {
+      await connection.rollback();
+      return res.status(404).json({
+        status: 'Error',
+        message: 'Booking not found',
+        data: null
+      });
+    }
+
+    if (booking.status === 'cancelled' && status !== 'cancelled') {
+       // Cannot uncancel easily because we'd need to re-check quota. For simplicity, prevent it.
+       await connection.rollback();
+       return res.status(400).json({
+         status: 'Error',
+         message: 'Cannot change status of a cancelled booking',
+         data: null
+       });
+    }
+
+    // Restore quota if cancelling
+    if (booking.status !== 'cancelled' && status === 'cancelled') {
+      await connection.query(
+        'UPDATE tour_packages SET quota = quota + ?, updated_at = NOW() WHERE id = ?',
+        [booking.total_pax, booking.tour_package_id]
+      );
+    }
+
+    // Mapped 'paid' or 'success' to 'confirmed' based on Prisma schema BookingStatus (pending, confirmed, cancelled)
+    const finalStatus = (status === 'paid' || status === 'success') ? 'confirmed' : status;
+
+    await connection.query(
+      'UPDATE bookings SET status = ?, updated_at = NOW() WHERE id = ?',
+      [finalStatus, booking_id]
+    );
+
+    // Sync payment status
+    if (finalStatus === 'confirmed') {
+      await connection.query(
+        'UPDATE payments SET status = ?, payment_date = NOW(), updated_at = NOW() WHERE booking_id = ? AND status != ?',
+        ['success', booking_id, 'success']
+      );
+    } else if (finalStatus === 'cancelled') {
+      await connection.query(
+        'UPDATE payments SET status = ?, updated_at = NOW() WHERE booking_id = ? AND status != ?',
+        ['failed', booking_id, 'failed']
+      );
+    }
+
+    await connection.commit();
+
+    return res.status(200).json({
+      status: 'Success',
+      message: 'Booking status updated successfully',
+      data: {
+        id: booking_id,
+        status: finalStatus
+      }
+    });
+  } catch (error: any) {
+    await connection.rollback();
+    console.error('Update booking status error:', error);
+    return res.status(500).json({
+      status: 'Error',
+      message: 'Internal server error',
+      data: null,
+      details: error.message
+    });
+  } finally {
+    connection.release();
+  }
+};
+

@@ -9,6 +9,8 @@ import { BookingList } from './pages/BookingList'
 import { BookingDetail } from './pages/BookingDetail'
 import { AdminPackageTable } from './pages/admin/AdminPackageTable'
 import { PackageForm } from './pages/admin/PackageForm'
+import { AdminBookingTable } from './pages/admin/AdminBookingTable'
+import { AdminDashboard } from './pages/admin/AdminDashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
 import './App.css'
@@ -60,8 +62,8 @@ function Dashboard() {
             My Bookings
           </Link>
           {user?.role === 'admin' && (
-            <Link to="/admin/packages" style={{ padding: '10px', background: '#f39c12', color: '#fff', textDecoration: 'none', borderRadius: '4px' }}>
-              Manage Packages
+            <Link to="/admin/dashboard" style={{ padding: '10px', background: '#8e44ad', color: '#fff', textDecoration: 'none', borderRadius: '4px' }}>
+              Admin Panel
             </Link>
           )}
           <button 
@@ -99,6 +101,8 @@ function App() {
 
       {/* Admin Routes */}
       <Route element={<AdminRoute />}>
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/bookings" element={<AdminBookingTable />} />
         <Route path="/admin/packages" element={<AdminPackageTable />} />
         <Route path="/admin/packages/new" element={<PackageForm />} />
         <Route path="/admin/packages/edit/:id" element={<PackageForm />} />

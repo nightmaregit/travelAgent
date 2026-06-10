@@ -3,28 +3,7 @@ submit issue.md sebagai github issue baru
 buatkan issue.md yang berisi perencanaan untuk nanti di implemenasikan oleh junior programmer atau ai model yang murah
 
 isi dari planingnya sebagai berikut:
-Buatkan frontend dengan tema travel agent berdasarkan api dibawah ini.
 
-C. Modul Bookings (Pemesanan)
-
-    POST /api/v1/bookings
-
-        Akses: Customer (Requires Token)
-
-        Request Body: tour_package_id, total_pax
-
-        Tujuan: Membuat pesanan baru. Penting: Sistem harus mengecek ketersediaan quota pada tour_packages sebelum membuat booking. Jika sukses, kalkulasi total_amount secara otomatis di back-end (jangan percaya harga dari request front-end).
-
-    GET /api/v1/bookings
-
-        Akses: Admin & Customer (Requires Token)
-
-        Tujuan: Jika user biasa, tampilkan hanya riwayat pesanannya sendiri. Jika admin, tampilkan semua pesanan masuk.
-
-    GET /api/v1/bookings/{id}
-
-        Akses: Admin & Customer (Requires Token)
-
-        Tujuan: Menampilkan detail spesifik dari sebuah pesanan (termasuk relasi ke paket wisata).
+buatkan landing page berdasarkan yang telah kita buat dan
 
 Jelaskan tahapan-tahapan yang harus dilkukan untuk mengimplementasikan fitur ini, anggap nanti yang implementasikan adalah junior programer atau model ai yang lebih murah

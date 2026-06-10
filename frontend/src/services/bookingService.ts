@@ -15,6 +15,9 @@ export interface Booking {
   destination?: string;
   start_date?: string;
   end_date?: string;
+  payment_status?: string;
+  proof_image?: string;
+  payment_id?: string;
 }
 
 export interface BookingInput {
@@ -43,5 +46,10 @@ export const getBookings = async () => {
 
 export const getBookingById = async (id: string) => {
   const response = await axios.get(`${API_URL}/${id}`, getAuthHeaders());
+  return response.data.data;
+};
+
+export const updateBookingStatus = async (id: string, status: string) => {
+  const response = await axios.put(`${API_URL}/${id}/status`, { status }, getAuthHeaders());
   return response.data.data;
 };
