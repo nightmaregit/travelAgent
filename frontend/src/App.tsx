@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom'
 import axios from 'axios'
+import LandingPage from './pages/LandingPage'
 import { Login } from './pages/Login'
 import { Register } from './pages/Register'
 import { PackageList } from './pages/PackageList'
@@ -87,14 +88,15 @@ function App() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/login" element={token ? <Navigate to="/" replace /> : <Login />} />
-      <Route path="/register" element={token ? <Navigate to="/" replace /> : <Register />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={token ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/register" element={token ? <Navigate to="/dashboard" replace /> : <Register />} />
       <Route path="/packages" element={<PackageList />} />
       <Route path="/packages/:id" element={<PackageDetail />} />
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/bookings" element={<BookingList />} />
         <Route path="/bookings/:id" element={<BookingDetail />} />
       </Route>

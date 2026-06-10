@@ -27,7 +27,7 @@ export const Login = () => {
       if (data && data.token) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        navigate('/');
+        navigate('/dashboard');
       }
     } catch (err) {
       if (axios.isAxiosError(err)) {
