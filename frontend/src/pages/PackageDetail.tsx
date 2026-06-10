@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getPackageById, type Package } from '../services/packageService';
+import { createBooking } from '../services/bookingService';
 import './Package.css';
 
 export const PackageDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [pkg, setPkg] = useState<Package | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Booking states
+  const [totalPax, setTotalPax] = useState<number>(1);
+  const [bookingLoading, setBookingLoading] = useState<boolean>(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPackage = async () => {
@@ -27,6 +34,44 @@ export const PackageDetail: React.FC = () => {
 
     fetchPackage();
   }, [id]);
+
+  const handleBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Please login first to book a package');
+      navigate('/login');
+      return;
+    }
+
+    if (totalPax < 1) {
+      setBookingError('Total pax must be at least 1');
+      return;
+    }
+
+    if (pkg && totalPax > pkg.quota) {
+      setBookingError('Insufficient quota available');
+      return;
+    }
+
+    setBookingLoading(true);
+    setBookingError(null);
+    try {
+      await createBooking({
+        tour_package_id: id,
+        total_pax: totalPax
+      });
+      alert('Booking successful!');
+      navigate('/bookings');
+    } catch (err: any) {
+      setBookingError(err.response?.data?.message || 'Failed to create booking. Please try again.');
+      console.error(err);
+    } finally {
+      setBookingLoading(false);
+    }
+  };
 
   const formatPrice = (price: string | number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -82,13 +127,33 @@ export const PackageDetail: React.FC = () => {
           <p>{pkg.description}</p>
         </div>
 
-        <button 
-          className="view-detail-btn" 
-          style={{ backgroundColor: '#3498db', border: 'none', cursor: 'pointer' }}
-          onClick={() => alert('Booking feature coming soon!')}
-        >
-          Book This Package
-        </button>
+        <div className="booking-section" style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: '#f8f9fa', borderRadius: '8px' }}>
+          <h3>Book This Package</h3>
+          {bookingError && <div className="error-message" style={{ marginBottom: '1rem' }}>{bookingError}</div>}
+          <form onSubmit={handleBooking} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div className="form-group" style={{ margin: 0 }}>
+              <label htmlFor="totalPax">Number of Pax</label>
+              <input 
+                type="number" 
+                id="totalPax"
+                min="1" 
+                max={pkg.quota}
+                value={totalPax} 
+                onChange={(e) => setTotalPax(parseInt(e.target.value))}
+                required
+                style={{ width: '100px' }}
+              />
+            </div>
+            <button 
+              type="submit"
+              className="view-detail-btn" 
+              style={{ backgroundColor: '#2ecc71', border: 'none', cursor: 'pointer', margin: 0, width: 'auto' }}
+              disabled={bookingLoading || pkg.quota === 0}
+            >
+              {bookingLoading ? 'Processing...' : pkg.quota === 0 ? 'Sold Out' : 'Confirm Booking'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -1,69 +1,80 @@
-# Issue: Implementasi Endpoint Detail Paket Wisata (Katalog Paket)
+# Task: Implementasi Frontend Modul Bookings (Pemesanan)
 
 ## Deskripsi Tugas
-Tugas ini bertujuan untuk membuat endpoint RESTful API yang berfungsi untuk menampilkan detail dari satu paket wisata berdasarkan ID-nya. Endpoint ini harus menggunakan standar format respons JSON yang seragam di seluruh aplikasi.
+Tugas ini bertujuan untuk membangun antarmuka pengguna (UI) dengan tema *Travel Agent* untuk fitur **Bookings** (Pemesanan Paket Wisata). Anda harus membuat tampilan yang terintegrasi dengan RESTful API yang sudah disediakan.
 
-**Spesifikasi Endpoint:**
-- **Modul:** Tour Packages (Katalog Paket)
-- **Metode:** `GET`
-- **URL:** `/api/v1/packages/{id}`
-- **Akses:** Publik (Tidak memerlukan Bearer Token)
-- **Tujuan:** Mengambil data detail satu paket wisata dari database berdasarkan `id`.
-- **Format Respons:** Wajib mengembalikan JSON dengan properti `status`, `message`, dan `data`.
+Pastikan mengikuti panduan ini langkah demi langkah secara berurutan. Panduan ini dirancang agar mudah diikuti oleh Junior Programmer atau AI assistant.
 
 ---
 
-## Panduan Implementasi (Langkah demi Langkah)
+## Endpoint API yang Digunakan
 
-Panduan ini disusun agar sangat mudah dipahami dan dieksekusi oleh Junior Programmer atau AI model. Silakan kerjakan secara berurutan:
+Semua API harus diawali dengan base URL `/api/v1` dan akan mengembalikan data dalam format JSON standar: `{ "status": "...", "message": "...", "data": ... }`.
 
-### Langkah 1: Pembuatan Logika di Controller
-1. Buka file controller untuk paket wisata, yaitu di `backend/src/controllers/packageController.ts` (buat jika belum ada).
-2. *Import* tipe `Request` dan `Response` dari `express`, serta koneksi database.
-3. Buat dan *export* fungsi *asynchronous* bernama `getPackageById`:
-   ```typescript
-   export const getPackageById = async (req: Request, res: Response) => {
-     // Logika akan ditulis di sini
-   };
-   ```
-4. **Logika Internal `getPackageById`:**
-   - Ambil nilai `id` dari parameter URL: `const { id } = req.params;`.
-   - Gunakan blok `try...catch` untuk menangkap potensi *error* saat akses database.
-   - Di dalam blok `try`:
-     - Jalankan query SQL untuk mencari paket wisata: `SELECT * FROM tour_packages WHERE id = ?`. Jangan lupa *passing* variabel `id` ke dalam query untuk mencegah SQL Injection.
-     - Simpan hasil query ke dalam sebuah variabel (misalnya `rows`).
-     - Lakukan pengecekan:
-       - Jika array hasil query kosong (`rows.length === 0` atau paket tidak ada), kembalikan respons HTTP `404 Not Found`:
-         ```json
-         { "status": "Error", "message": "Package not found", "data": null }
-         ```
-       - Jika paket ditemukan, kembalikan respons HTTP `200 OK`:
-         ```json
-         { "status": "Success", "message": "Package retrieved successfully", "data": { /* objek paket di sini */ } }
-         ```
-   - Di dalam blok `catch`:
-     - Tampilkan error di console (`console.error`).
-     - Kembalikan respons HTTP `500 Internal Server Error`:
-       ```json
-       { "status": "Error", "message": "Internal server error", "data": null, "details": error.message }
-       ```
+1.  **`POST /api/v1/bookings`**
+    *   **Akses:** Customer (Wajib mengirimkan Bearer Token di Header Authorization).
+    *   **Request Body:** `tour_package_id` (string), `total_pax` (number).
+    *   **Tujuan:** Membuat pesanan baru.
+    *   *Catatan Integrasi:* Sistem backend akan otomatis mengecek ketersediaan quota pada paket wisata dan mengkalkulasi `total_amount`. Tidak perlu mengirim harga dari frontend.
 
-### Langkah 2: Registrasi Endpoint di Router
-1. Buka file routing paket wisata di `backend/src/routes/packageRoutes.ts`.
-2. Pastikan fungsi `getPackageById` sudah di-*import* dari `packageController.ts`.
-3. Daftarkan *route* baru untuk *method* `GET` yang mengarah ke `/:id`:
-   ```typescript
-   router.get('/:id', getPackageById);
-   ```
-   *(Catatan: Pastikan penempatan rute dinamis `/:id` berada di bawah rute statis jika ada rute statis lain, agar tidak terjadi bentrok. Base URL `/api/v1/packages` sudah ditangani di `index.ts`)*.
+2.  **`GET /api/v1/bookings`**
+    *   **Akses:** Admin & Customer (Wajib mengirimkan Bearer Token).
+    *   **Tujuan:** Menampilkan daftar pemesanan.
+    *   *Catatan:* Backend otomatis memfilter: jika user biasa, hanya pesanan miliknya yang tampil; jika admin, semua pesanan akan tampil.
 
-### Langkah 3: Pengujian (Testing)
-Setelah kode ditulis, jalankan server *backend* (misal dengan `bun run dev`) dan lakukan pengujian dengan API Client seperti Thunder Client, Postman, atau perintah `curl` di terminal.
+3.  **`GET /api/v1/bookings/{id}`**
+    *   **Akses:** Admin & Customer (Wajib mengirimkan Bearer Token).
+    *   **Tujuan:** Menampilkan detail spesifik dari sebuah pesanan, termasuk relasinya ke tabel `tour_packages` (seperti nama paket, destinasi, dan tanggal).
 
-- **Skenario 1 (Sukses):**
-  Lakukan *request*: `GET http://localhost:3000/api/v1/packages/{id_yang_valid_di_db}`
-  *Ekspektasi:* Status HTTP 200 dan JSON mengembalikan detail spesifik paket tersebut.
+---
 
-- **Skenario 2 (Gagal - Data Tidak Ada):**
-  Lakukan *request*: `GET http://localhost:3000/api/v1/packages/id-palsu-123`
-  *Ekspektasi:* Status HTTP 404 dan JSON menginformasikan bahwa *Package not found*.
+## Tahapan Implementasi (Step-by-Step)
+
+Kerjakan instruksi di bawah ini secara bertahap:
+
+### Langkah 1: Persiapan API Service (`bookingService.ts`)
+1. Buat file baru di `frontend/src/services/bookingService.ts`.
+2. Buat fungsi helper untuk mengambil token dari `localStorage` dan menyisipkannya ke header `Authorization: Bearer <token>`.
+3. Gunakan library `axios` untuk membuat 3 fungsi:
+   - `createBooking(data: { tour_package_id: string; total_pax: number })`
+   - `getBookings()`
+   - `getBookingById(id: string)`
+4. *Penting:* Karena respons backend dibungkus dalam properti `data`, pastikan fungsi Anda me-*return* `response.data.data`.
+
+### Langkah 2: UI Form Pemesanan (Di Halaman Detail Paket)
+1. Buka file `frontend/src/pages/PackageDetail.tsx`.
+2. Tambahkan *state* untuk `total_pax` (default: 1) dan *state* untuk proses loading/error pemesanan.
+3. Di bagian informasi paket, buat sebuah form kecil berisi:
+   - Input tipe `number` untuk "Jumlah Orang (Pax)" (minimal 1).
+   - Tombol "Confirm Booking" (atau "Pesan Sekarang").
+4. Saat tombol diklik:
+   - Panggil fungsi `createBooking` dari *service* dengan membawa `tour_package_id` (dari parameter URL/data paket) dan `total_pax`.
+   - Tampilkan alert sukses jika berhasil, dan *redirect* (menggunakan `useNavigate`) ke rute `/bookings`.
+
+### Langkah 3: UI Daftar Pesanan (My Bookings)
+1. Buat komponen baru di `frontend/src/pages/BookingList.tsx`.
+2. Saat komponen di-*mount* (`useEffect`), panggil fungsi `getBookings()`.
+3. Tampilkan data tersebut menggunakan desain tabel atau list/card. Pastikan kolom ini terlihat:
+   - Kode Booking (`booking_code`)
+   - Nama Paket
+   - Tanggal Pesan
+   - Total Pax
+   - Total Harga (Format Rupiah)
+   - Status (Pending/Success/Cancelled)
+4. Pada setiap baris/card, berikan tombol "View Detail" yang mengarah ke link `/bookings/:id`.
+
+### Langkah 4: UI Detail Pesanan
+1. Buat komponen baru di `frontend/src/pages/BookingDetail.tsx`.
+2. Tangkap ID dari URL menggunakan `useParams`.
+3. Saat komponen di-*mount*, panggil fungsi `getBookingById(id)`.
+4. Tampilkan informasi detail pemesanan dengan rapi (Kode, Status, Tanggal, Harga, dsb), serta informasi detail *Tour Package* yang dipesan.
+
+### Langkah 5: Registrasi Rute (Routing) & Navigasi
+1. Buka file `frontend/src/App.tsx`.
+2. Daftarkan dua rute baru **di dalam `<ProtectedRoute>`** (karena butuh login):
+   - `<Route path="/bookings" element={<BookingList />} />`
+   - `<Route path="/bookings/:id" element={<BookingDetail />} />`
+3. Tambahkan tombol/link navigasi "My Bookings" di komponen Dashboard (atau Navigation Bar) agar user mudah mengakses halaman daftar pemesanan.
+
+---
+**Catatan untuk Developer:** Fokuslah pada modularitas kode dan fungsionalitas utama terlebih dahulu. Desain CSS bisa menggunakan gaya dasar/vanilla atau menyamakan dengan `Package.css` yang sudah ada agar terkesan konsisten.

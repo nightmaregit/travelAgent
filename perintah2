@@ -3,24 +3,28 @@ submit issue.md sebagai github issue baru
 buatkan issue.md yang berisi perencanaan untuk nanti di implemenasikan oleh junior programmer atau ai model yang murah
 
 isi dari planingnya sebagai berikut:
-Buatkan routing dan controller logic berdasarkan daftar endpoint RESTful API di bawah ini. Gunakan standar format respons JSON. Implementasikan sistem autentikasi menggunakan Bearer Token (JWT/Sanctum). Semua endpoint harus diawali dengan base prefix /api/v1.
+Buatkan frontend dengan tema travel agent berdasarkan api dibawah ini.
 
-A. Modul Authentication (Otentikasi)
+C. Modul Bookings (Pemesanan)
 
-    POST /api/v1/auth/register
+    POST /api/v1/bookings
 
-        Akses: Publik
+        Akses: Customer (Requires Token)
 
-        Request Body: full_name, email, password, phone_number
+        Request Body: tour_package_id, total_pax
 
-        Tujuan: Mendaftarkan customer baru.
+        Tujuan: Membuat pesanan baru. Penting: Sistem harus mengecek ketersediaan quota pada tour_packages sebelum membuat booking. Jika sukses, kalkulasi total_amount secara otomatis di back-end (jangan percaya harga dari request front-end).
 
-    POST /api/v1/auth/login
+    GET /api/v1/bookings
 
-        Akses: Publik
+        Akses: Admin & Customer (Requires Token)
 
-        Request Body: email, password
+        Tujuan: Jika user biasa, tampilkan hanya riwayat pesanannya sendiri. Jika admin, tampilkan semua pesanan masuk.
 
-        Tujuan: Mengembalikan Bearer Token dan data user.
+    GET /api/v1/bookings/{id}
+
+        Akses: Admin & Customer (Requires Token)
+
+        Tujuan: Menampilkan detail spesifik dari sebuah pesanan (termasuk relasi ke paket wisata).
 
 Jelaskan tahapan-tahapan yang harus dilkukan untuk mengimplementasikan fitur ini, anggap nanti yang implementasikan adalah junior programer atau model ai yang lebih murah

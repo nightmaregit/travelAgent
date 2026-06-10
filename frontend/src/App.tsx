@@ -5,6 +5,8 @@ import { Login } from './pages/Login'
 import { Register } from './pages/Register'
 import { PackageList } from './pages/PackageList'
 import { PackageDetail } from './pages/PackageDetail'
+import { BookingList } from './pages/BookingList'
+import { BookingDetail } from './pages/BookingDetail'
 import { AdminPackageTable } from './pages/admin/AdminPackageTable'
 import { PackageForm } from './pages/admin/PackageForm'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -54,6 +56,9 @@ function Dashboard() {
           <Link to="/packages" style={{ padding: '10px', background: '#3498db', color: '#fff', textDecoration: 'none', borderRadius: '4px' }}>
             Browse Packages
           </Link>
+          <Link to="/bookings" style={{ padding: '10px', background: '#2ecc71', color: '#fff', textDecoration: 'none', borderRadius: '4px' }}>
+            My Bookings
+          </Link>
           {user?.role === 'admin' && (
             <Link to="/admin/packages" style={{ padding: '10px', background: '#f39c12', color: '#fff', textDecoration: 'none', borderRadius: '4px' }}>
               Manage Packages
@@ -88,6 +93,8 @@ function App() {
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/bookings" element={<BookingList />} />
+        <Route path="/bookings/:id" element={<BookingDetail />} />
       </Route>
 
       {/* Admin Routes */}
