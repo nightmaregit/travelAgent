@@ -3,8 +3,6 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspace",
-  "dockerPath": "podman",
-  "dockerComposePath": "podman-compose",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -15,5 +13,6 @@
       ]
     }
   },
-  "remoteUser": "root"
+  "remoteUser": "root",
+  "postCreateCommand": "echo 'Container is ready! Please run bun install in both backend and frontend directories.' > /workspace/welcome.txt"
 }
