@@ -1,0 +1,33 @@
+  Apa yang Salah dan Apa yang Telah Diperbaiki?
+   1. Ketergantungan pada Podman (devcontainer.json):
+     Sebelumnya, konfigurasi secara hardcode memaksa penggunaan Podman ("dockerPath": "podman"). Ini akan membuat error jika orang lain (rekan tim)
+  menggunakan Docker Desktop. Saya telah menghapus baris tersebut. Sekarang, VS Code akan otomatis menggunakan Docker standar, atau menggunakan Podman
+  jika user tersebut telah mengaturnya di setingan global VS Code mereka.
+   2. Build Image Otomatis (docker-compose.yml):
+     Sebelumnya, compose merujuk ke image yang sudah ada (image: localhost/devcontainer_app:latest). Orang baru yang mengkloning repositori ini tidak
+  akan memiliki image tersebut. Saya telah mengubahnya menjadi build: yang merujuk ke Dockerfile, sehingga VS Code akan mem-build ulang image-nya
+  secara otomatis saat DevContainer pertama kali dibuka.
+
+  Cara Orang Lain Menggunakannya
+  Agar orang lain dapat menggunakan DevContainer ini, mereka hanya perlu melakukan langkah berikut:
+
+   1. Prasyarat Aplikasi:
+      * Pastikan mereka sudah menginstal Docker Desktop (atau Podman) dan status mesinnya sedang berjalan (running).
+      * Pastikan mereka sudah menginstal Visual Studio Code.
+      * Di dalam VS Code, instal ekstensi resmi bernama "Dev Containers" (oleh Microsoft).
+
+   2. Membuka Proyek:
+      * Buka terminal dan kloning repositori ini: git clone <url-repo-anda>
+      * Buka folder proyek tersebut di VS Code.
+      * VS Code akan mendeteksi folder .devcontainer dan memunculkan pop-up di pojok kanan bawah bertuliskan "Reopen in Container". Klik tombol
+        tersebut.
+      * (Alternatif jika pop-up tidak muncul): Tekan Ctrl + Shift + P (atau Cmd + Shift + P di Mac), ketik "Dev Containers: Reopen in Container", lalu
+        tekan Enter.
+
+   3. Inisialisasi Pertama Kali:
+      * VS Code akan mulai membuat image container dan menjalankan database MySQL serta Backend/Frontend secara bersamaan. (Proses ini mungkin memakan
+        waktu beberapa menit saat pertama kali dijalankan).
+      * Setelah selesai, mereka akan berada di dalam sistem Linux berbasis container (sudah tersedia Bun, Node, Git, dsb).
+      * Mereka tinggal membuka terminal VS Code di dalam container dan menjalankan instalasi dependency untuk backend dan frontend:
+   1      cd backend && bun install
+   2      cd ../frontend && bun install
