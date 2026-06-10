@@ -22,11 +22,11 @@ export const Login = () => {
     setError('');
     setLoading(true);
     try {
-      const response = await loginUser(formData);
-      // Accessing token from response.data.token because the backend structure is { status, message, data: { token, user } }
-      if (response.data && response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      const data = await loginUser(formData);
+      // Accessing token from data because loginUser now returns response.data.data
+      if (data && data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         navigate('/');
       }
     } catch (err) {

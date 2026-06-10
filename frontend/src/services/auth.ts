@@ -20,10 +20,10 @@ export interface AuthResponse {
 
 export const registerUser = async (data: any) => {
   const response = await axios.post(`${API_URL}/register`, data);
-  return response.data;
+  return response.data.data;
 };
 
-export const loginUser = async (data: any): Promise<AuthResponse> => {
-  const response = await axios.post<AuthResponse>(`${API_URL}/login`, data);
-  return response.data;
+export const loginUser = async (data: any): Promise<any> => {
+  const response = await axios.post(`${API_URL}/login`, data);
+  return response.data.data;
 };
